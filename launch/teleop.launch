@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <!-- Launch sensors (LIDAR, IMU, Encoders, Motors) -->
+<!--  <include file="$(find my_robot)/launch/sensors.launch"/> -->
+  
+  <!-- Launch keyboard teleoperation -->
+  <node pkg="my_robot" type="teleop_keyboard.py" name="teleop_keyboard" output="screen"/>
+  
+</launch>
+

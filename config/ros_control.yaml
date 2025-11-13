@@ -1,0 +1,23 @@
+# Controller Manager Configuration
+controller_manager:
+  update_rate: 50
+
+# 1. Joint State Controller
+# Publishes the actual state of the hardware to /joint_states
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# 2. Left Wheel PID Controller
+# This is a closed-loop controller that uses encoder feedback
+left_wheel_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: left_wheel_joint
+  pid: {p: 1.0, i: 0.01, d: 0.0} # Tune these values!
+
+# 3. Right Wheel PID Controller
+# This is a closed-loop controller that uses encoder feedback
+right_wheel_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: right_wheel_joint
+  pid: {p: 1.0, i: 0.01, d: 0.0} # Tune these values!

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- ============================================ -->
+    <!-- RPLIDAR -->
+    <!-- ============================================ -->
+    <node name="rplidar_node"
+          pkg="rplidar_ros"
+          type="rplidarNode"
+          output="screen">
+        <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
+        <param name="serial_baudrate" type="int" value="115200"/>
+        <param name="frame_id" type="string" value="laser_frame"/>
+        <param name="inverted" type="bool" value="false"/>
+        <param name="angle_compensate" type="bool" value="true"/>
+    </node>
+
+    <!-- ============================================ -->
+    <!-- ROBOT DESCRIPTION -->
+    <!-- ============================================ -->
+    <param name="robot_description"
+           textfile="$(find my_robot)/urdf/robot.urdf" />
+
+    <!-- ============================================ -->
+    <!-- ROBOT STATE PUBLISHER -->
+    <!-- ============================================ -->
+    <node name="robot_state_publisher"
+          pkg="robot_state_publisher"
+          type="robot_state_publisher"
+          output="screen">
+        <param name="publish_frequency" value="50.0"/>
+    </node>
+
+    <!-- ============================================ -->
+    <!-- ROS CONTROL PARAMETERS -->
+    <!-- ============================================ -->
+    <rosparam file="$(find my_robot)/config/ros_control.yaml" command="load"/>
+
+    <!-- ============================================ -->
+    <!-- HARDWARE INTERFACE NODE -->
+    <!-- ============================================ -->
+    <node name="pi_hardware_interface"
+          pkg="my_robot"
+          type="pi_hardware_interface.py"
+          output="screen"/>
+
+    <!-- ============================================ -->
+    <!-- CONTROLLER SPAWNERS -->
+    <!-- ============================================ -->
+    <node name="controller_spawner"
+          pkg="controller_manager"
+          type="spawner"
+          respawn="false"
+          output="screen"
+          args="joint_state_controller diff_drive_controller"/>
+    <include file="$(find my_robot)/launch/control.launch"/>
+</launch>

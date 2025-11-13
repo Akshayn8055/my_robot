@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
+    <rosparam command="load" file="$(find my_robot)/config/ekf_params.yaml"/>
+     <param name="publish_tf" value="true"/>
+     <param name="publish_acceleration" value="true"/>
+     <param name="output_frame" value="odom"/>
+     <remap from="odometry/filtered" to="/odometry/filtered"/>
+  </node>
+  
+</launch>
+

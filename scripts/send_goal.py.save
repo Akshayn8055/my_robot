@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+import rospy
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import Quaternion
+from tf.transformations import quaternion_from_euler
+import math
+def send_goal(x, y, yaw):
+ """
+ Send a navigation goal to move_base.
+
+ Args:
+ x: X coordinate in meters (map frame)
+ y: Y coordinate in meters (map frame)
+ yaw: Orientation in radians
+ """
+ client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+
+ rospy.loginfo("Waiting for move_base action server...")
+ client.wait_for_server()
+ rospy.loginfo("Connected to move_base server!")
+
+ goal = MoveBaseGoal()
+ goal.target_pose.header.frame_id = "map"
+ goal.target_pose.header.stamp = rospy.Time.now()
+
+ goal.target_pose.pose.position.x = x
+ goal.target_pose.pose.position.y = y
+
+ # Convert yaw to quaternion
+ q = quaternion_from_euler(0, 0, yaw)
+ goal.target_pose.pose.orientation = Quaternion(*q)
+
+ rospy.loginfo(f"Sending goal: x={x:.2f}, y={y:.2f}, yaw={math.degrees(yaw):.1f}°")
+ client.send_goal(goal)
+
+ # Wait for result
+ rospy.loginfo("Waiting for robot to reach goal...")
+ wait = client.wait_for_result()
+
+ if wait:
+ rospy.loginfo("✓ Goal reached successfully!")
+ return True
+ else:
+ rospy.logerr("✗ Failed to reach goal")
+ return False
+if __name__ == '__main__':
+ rospy.init_node('goal_sender')
+
+ # Example waypoints - CHANGE THESE TO MATCH YOUR MAP
+ waypoints = [
+ (1.0, 0.5, 0), # Go forward 1m
+ (1.0, 1.5, math.pi/2), # Turn and go left
+ (0.0, 1.5, math.pi), # Turn around
+ (0.0, 0.0, 0), # Return to start
+ ]
+
+ rospy.loginfo("Starting waypoint mission...")
+ for i, (x, y, yaw) in enumerate(waypoints, 1):
+ rospy.loginfo(f"\n--- Waypoint {i}/{len(waypoints)} ---")
+ success = send_goal(x, y, yaw)
+
+ if not success:
+ rospy.logwarn("Skipping remaining waypoints due to failure")
+ break
+
+ rospy.sleep(1) # Pause between waypoints
+
+ rospy.loginfo("\n✓ Mission comp

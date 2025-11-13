@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <!-- Load the saved map -->
+  <arg name="map_file" default="$(find my_robot)/maps/my_map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+  
+  <!-- SLAM Toolbox in Localization Mode -->
+  <node pkg="slam_toolbox" type="localization_slam_toolbox_node" name="slam_toolbox" output="screen">
+    <rosparam command="load" file="$(find my_robot)/config/mapper_params_localization.yaml" />
+    <param name="map_file_name" value="$(find my_robot)/maps/my_map"/>
+    <param name="map_start_pose" value="[0.0, 0.0, 0.0]"/>
+  </node>
+  
+  <!-- Move Base (same as before) -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find my_robot)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find my_robot)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find my_robot)/config/local_costmap_params.yaml" command="load"/>
+    <rosparam file="$(find my_robot)/config/global_costmap_params.yaml" command="load"/>
+    <rosparam file="$(find my_robot)/config/base_local_planner_params.yaml" command="load"/>
+    
+    <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+    <param name="controller_frequency" value="5.0"/>
+    <param name="planner_patience" value="5.0"/>
+    <param name="controller_patience" value="15.0"/>
+    <param name="clearing_rotation_allowed" value="true"/>
+  </node>
+  
+</launch>

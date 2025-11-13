@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="robot_description" textfile="$(find my_robot)/urdf/robot.urdf" />
+
+  <rosparam file="$(find my_robot)/config/ros_control.yaml" command="load"/>
+
+  <node name="controller_manager" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="--namespace /" />
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="joint_state_controller
+              left_wheel_velocity_controller
+              right_wheel_velocity_controller"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+</launch>
